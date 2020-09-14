@@ -1,0 +1,12 @@
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\StrEmailMonitoring.dll
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\StrEmailMonitoring.pdb
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\Dapper.dll
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\System.Data.SQLite.dll
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\Dapper.xml
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\System.Data.SQLite.xml
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\bin\Debug\System.Data.SQLite.dll.config
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\obj\Debug\StrEmailMonitoring.csproj.CoreCompileInputs.cache
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\obj\Debug\StrEmailMonitoring.csproj.CopyComplete
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\obj\Debug\StrEmailMonitoring.dll
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\obj\Debug\StrEmailMonitoring.pdb
+D:\sandbox\StrEmailMonitoring\StrEmailMonitoring\obj\Debug\StrEmailMonitoring.csprojAssemblyReference.cache
