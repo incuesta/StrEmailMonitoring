@@ -6,14 +6,14 @@ using System.ComponentModel;
 namespace StrEmailMonitoring
 {
     /// <summary>
-    /// Add entry to InboundStrEmails Table
+    /// Add entry to OutboundStrEmails Table
     /// </summary>
     public sealed class InsertOutboundStrEmailsToDb : NativeActivity<int>
     {
         #region .    Activity Name    .
         public InsertOutboundStrEmailsToDb()
         {
-            this.DisplayName = "Insert Inbound Str Emails To Db";
+            this.DisplayName = "Insert Outbound Str Emails To Db";
         }
         #endregion
 

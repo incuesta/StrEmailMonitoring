@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CreateStrEmailsRecipientsTable.cs" />
     <Compile Include="DbHelpers\MyDbUtils.cs" />
+    <Compile Include="GetDisapprovalStatusInboundStrEmails.cs" />
     <Compile Include="GetApprovalStatusInboundStrEmails.cs" />
     <Compile Include="InsertOutboundStrEmailsToDb.cs" />
     <Compile Include="GetPhaseInboundStrEmails.cs" />

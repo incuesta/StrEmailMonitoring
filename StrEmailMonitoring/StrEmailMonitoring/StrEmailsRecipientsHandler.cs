@@ -89,5 +89,29 @@ namespace StrEmailMonitoring.StrEmailMonitoring
             return mdu.LoadEntries(tableName: TABLE_NAME, orderBy: "EmailUsername", perBatch: perBatch, currentBatch: currentBatch, criteria: criteriaX);
         }
 
+
+        /// <summary>
+        /// Load an entry based from a given Username
+        /// </summary>
+        /// <param name="perBatch"></param>
+        /// <param name="currentBatch"></param>
+        /// <param name="phaseX">PHASE1 PHASE2 or PHASE3</param>
+        public DataTable LoadFromDbIsAvailable(string phaseX, int perBatch = 50, int currentBatch = 1)
+        {
+            string groupX = string.Empty;
+            if (!string.IsNullOrEmpty(phaseX))
+            {
+                groupX = phaseX?.Last().ToString().Trim() ?? string.Empty;
+            }
+            Dictionary<string, string> criteriaX = new Dictionary<string, string>()
+            {
+                ["IsAvailable"] = "YES",
+                ["RecipientGroup"] = groupX
+            };
+
+            MyDbUtils mdu = new MyDbUtils(this.DbPath);
+            return mdu.LoadEntries(tableName: TABLE_NAME, orderBy: "RecipientGroup", perBatch: perBatch, currentBatch: currentBatch, criteria: criteriaX);
+        }
+
     }
 }

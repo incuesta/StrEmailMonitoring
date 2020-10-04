@@ -534,6 +534,97 @@ namespace StrEmailMonitoring
         }
 
 
+        /// <summary>
+        /// Count entries within the db
+        /// </summary>
+        /// <returns></returns>
+        public long CountEntriesViaSubquery(string tableName = "", Dictionary<string, string> criteria = null, Dictionary<string, string> innerCriteria = null, string innerColumn = "", string innerTable = "")
+        {
+            DataTable xdt = new DataTable(); ;
+            long countResult = 0;
+            if (cnn != null)
+            {
+                try
+                {
+                    cnn.Open();
+                    SQLiteCommand cmd = cnn.CreateCommand();
+                    string q = $"SELECT COUNT(ID) FROM {tableName} ";
+
+
+                    if (innerCriteria != null)
+                    {
+                        int cti = 1;
+
+                        q += $"WHERE {innerColumn} IN ( ";
+                        q += $"SELECT {innerColumn} FROM {innerTable} ";
+                        q += $"WHERE ";
+
+                        foreach (KeyValuePair<string, string> kv in innerCriteria)
+                        {
+                            q += $"{kv.Key} = @{kv.Key} ";
+                            //q += $"{kv.Key} = '{kv.Value}' ";
+
+                            if (cti < innerCriteria.Count)
+                            {
+                                q += "AND ";
+                                cti += 1;
+                            }
+                        }
+                        q += $" ) ";
+                    }
+
+
+                    if (criteria != null)
+                    {
+                        int ct = 1;
+
+                        q += "AND ";
+
+                        foreach (KeyValuePair<string, string> kv in criteria)
+                        {
+                            q += $"{kv.Key} = ${kv.Key} ";
+                            // q += $"{kv.Key} = '{kv.Value}' ";
+
+                            if (ct < criteria.Count)
+                            {
+                                q += "AND ";
+                                ct += 1;
+                            }
+                        }
+                    }
+                    
+
+                    cmd.CommandText = q;
+                    if (criteria != null)
+                    {
+                        foreach (KeyValuePair<string, string> kv in criteria)
+                        {
+                            cmd.Parameters.Add($"${kv.Key}", DbType.String).Value = kv.Value;
+                        }
+                    }
+                    if (innerCriteria != null)
+                    {
+                        foreach (KeyValuePair<string, string> kv in innerCriteria)
+                        {
+                            cmd.Parameters.Add($"@{kv.Key}", DbType.String).Value = kv.Value;
+                        }
+                    }
+
+                    countResult = long.TryParse(cmd.ExecuteScalar().ToString(), out long resultX) ? resultX : 0;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[CountEntries] Query Error >>> {e.Message}");
+                    cnn.Close();
+                }
+            }
+            else
+            {
+                Console.WriteLine("[CountEntries] Connection is null");
+            }
+            return countResult;
+        }
+
 
         /// <summary>
         /// Insert an Entry into the SasReport DB
@@ -687,7 +778,7 @@ namespace StrEmailMonitoring
                 {
 
                     cnn.Close();
-                    Console.WriteLine("[UpdateEntry] update query failed");
+                    Console.WriteLine($"[UpdateEntry] update query failed {e.Message}");
                     return false;
                 }
 
@@ -721,7 +812,7 @@ namespace StrEmailMonitoring
                 catch (Exception e)
                 {
                     cnn.Close();
-                    Console.WriteLine("[DeleteEntries]  Delete failed");
+                    Console.WriteLine($"[DeleteEntries]  Delete failed {e.Message}");
                     return false;
                 }
             }

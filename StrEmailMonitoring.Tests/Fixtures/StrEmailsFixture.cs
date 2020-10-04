@@ -189,6 +189,16 @@ namespace StrEmailMonitoring.Tests
             };
             listX.Add(list11);
 
+            List<string> list12 = new List<string>() {
+                "file1.xlsx",
+                "STR Committee Approval [Filname1.docx] (PHASE1)",
+                "Alvin C Go/Banco_de_Oro",
+                "APPROVED",
+                DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff")
+            };
+            listX.Add(list12);
+
+
 
             return listX;
 
@@ -202,4 +212,6 @@ namespace StrEmailMonitoring.Tests
             this.OutboundEmailsList = null;
         }
     }
+
+
 }

@@ -37,7 +37,7 @@ namespace StrEmailMonitoring.Tests
             }
             MyDbUtils muForRead = new MyDbUtils(this.DbPath);
             long actualCount = muForRead.CountEntries("InboundStrEmails");
-            long expectedCount = 11;
+            long expectedCount = 12;
             Assert.Equal(expectedCount, actualCount);
         }
 
@@ -57,6 +57,14 @@ namespace StrEmailMonitoring.Tests
             InboundStrEmailsHandler iSEHandler = new InboundStrEmailsHandler(this.DbPath);
             bool actualApproval = iSEHandler.IsApproved("file1.xlsx");
             Assert.True(actualApproval);
+        }
+
+        [Fact]
+        public void IsDisapproved_ShouldReturnDisapprovalStatus()
+        {
+            InboundStrEmailsHandler iSEHandler = new InboundStrEmailsHandler(this.DbPath);
+            bool actualApproval = iSEHandler.IsDisapproved("file1.xlsx");
+            Assert.True(!actualApproval);
         }
     }
 }

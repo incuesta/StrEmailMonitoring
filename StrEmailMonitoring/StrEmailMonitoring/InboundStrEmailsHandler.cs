@@ -18,6 +18,7 @@ namespace StrEmailMonitoring
         private string  Response { get; set; }
         private string  ResponseDate { get; set; }
         private string  Phase { get; set; }
+        private List<DataRow>  StrRecipientsDrList { get; set; }
         private const string TABLE_NAME = "InboundStrEmails";
 
 
@@ -30,6 +31,12 @@ namespace StrEmailMonitoring
             this.Response = response;
             this.ResponseDate = responseDate;
             this.Phase = GetPhase(emailUsername);
+        }
+
+        public InboundStrEmailsHandler(string dbPath, DataTable strRecipientsDT)
+        {
+            this.DbPath = dbPath;
+            this.StrRecipientsDrList = strRecipientsDT.AsEnumerable().ToList();
         }
 
 
@@ -146,7 +153,10 @@ namespace StrEmailMonitoring
             };
 
             MyDbUtils mdu = new MyDbUtils(this.DbPath);
-            return mdu.LoadEntries(tableName: TABLE_NAME, orderBy: "Phase", perBatch: perBatch, currentBatch: currentBatch, criteria: criteriaX);
+            DataTable resultDT = mdu.LoadEntries(tableName: TABLE_NAME, orderBy: "Phase", perBatch: perBatch, currentBatch: currentBatch, criteria: criteriaX);
+
+            
+            return resultDT;
         }
 
         /// <summary>
@@ -158,7 +168,11 @@ namespace StrEmailMonitoring
         {
             string phaseString = "";
             DataTable dtX = LoadFromDbViaFileName(fileName);
-            phaseString = (dtX.AsEnumerable().OrderBy(drX => drX["Phase"])?.LastOrDefault())["Phase"]?.ToString() ?? string.Empty;
+            if (dtX.Rows.Count > 0)
+            {
+                 phaseString = (dtX.AsEnumerable().OrderBy(drX => drX["Phase"])?.LastOrDefault())["Phase"]?.ToString() ?? string.Empty;
+            }
+
             return phaseString;
         }
 
@@ -179,8 +193,56 @@ namespace StrEmailMonitoring
                 ["Response"] = "APPROVED"
             };
             long resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
-            MessageBox.Show(resultCt.ToString());
-            return resultCt >= 2;
+            Console.WriteLine($"Approval Count >>> {resultCt}");
+
+            return resultCt >= 3;
+        }
+
+
+        /// <summary>
+        /// Determine approval
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public bool IsDisapproved(string fileName)
+        {
+            string phaseX = GetCurrentPhaseViaFileName(fileName);
+
+            StrEmailsRecipientsHandler strRecipientsH = new StrEmailsRecipientsHandler(this.DbPath);
+            DataTable IsAvailableDt = strRecipientsH.LoadFromDbIsAvailable(phaseX);
+            Double IsAvailableCount = IsAvailableDt.AsEnumerable().Count();
+            Double cutOff = IsAvailableCount / 2.0;
+
+            // Disapproval count
+            MyDbUtils mdu = new MyDbUtils(this.DbPath);
+            Dictionary<string, string> countCritX = new Dictionary<string, string>()
+            {
+                ["FileName"] = fileName,
+                ["Phase"] = phaseX,
+                ["Response"] = "REJECTED"
+            };
+            Double resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
+
+            // Overall count of responses
+            MyDbUtils mduY = new MyDbUtils(this.DbPath);
+            Dictionary<string, string> countCritY = new Dictionary<string, string>()
+            {
+                ["FileName"] = fileName,
+                ["Phase"] = phaseX,
+            };
+            Double overallCt = mduY.CountEntries(TABLE_NAME, countCritY);
+
+
+            if (overallCt < cutOff) // not enuf respondents
+            {
+                return false; // dont label as disapproved
+            }
+
+            if (resultCt == 0) // non existing filename
+            {
+                return false;
+            }
+            return resultCt >= cutOff;
         }
     }
 }
