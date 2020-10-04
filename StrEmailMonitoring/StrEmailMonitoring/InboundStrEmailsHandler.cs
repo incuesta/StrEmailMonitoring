@@ -200,18 +200,61 @@ namespace StrEmailMonitoring
 
 
         /// <summary>
-        /// Determine approval
+        /// Determine approval based on majority
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        //public bool IsDisapproved(string fileName)
+        //{
+        //    string phaseX = GetCurrentPhaseViaFileName(fileName);
+
+        //    StrEmailsRecipientsHandler strRecipientsH = new StrEmailsRecipientsHandler(this.DbPath);
+        //    DataTable IsAvailableDt = strRecipientsH.LoadFromDbIsAvailable(phaseX);
+        //    Double IsAvailableCount = IsAvailableDt.AsEnumerable().Count();
+        //    Double cutOff = IsAvailableCount / 2.0;
+
+        //    // Disapproval count
+        //    MyDbUtils mdu = new MyDbUtils(this.DbPath);
+        //    Dictionary<string, string> countCritX = new Dictionary<string, string>()
+        //    {
+        //        ["FileName"] = fileName,
+        //        ["Phase"] = phaseX,
+        //        ["Response"] = "REJECTED"
+        //    };
+        //    Double resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
+
+        //    // Overall count of responses
+        //    MyDbUtils mduY = new MyDbUtils(this.DbPath);
+        //    Dictionary<string, string> countCritY = new Dictionary<string, string>()
+        //    {
+        //        ["FileName"] = fileName,
+        //        ["Phase"] = phaseX,
+        //    };
+        //    Double overallCt = mduY.CountEntries(TABLE_NAME, countCritY);
+
+
+        //    if (overallCt < cutOff) // not enuf respondents
+        //    {
+        //        return false; // dont label as disapproved
+        //    }
+
+        //    if (resultCt == 0) // non existing filename
+        //    {
+        //        return false;
+        //    }
+        //    return resultCt >= cutOff;  // True if REJECTED count is more than the cutOff count
+        //}
+
+
+
+        /// <summary>
+        /// Determine approval if 3 or more REJECTED
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
         public bool IsDisapproved(string fileName)
         {
             string phaseX = GetCurrentPhaseViaFileName(fileName);
-
-            StrEmailsRecipientsHandler strRecipientsH = new StrEmailsRecipientsHandler(this.DbPath);
-            DataTable IsAvailableDt = strRecipientsH.LoadFromDbIsAvailable(phaseX);
-            Double IsAvailableCount = IsAvailableDt.AsEnumerable().Count();
-            Double cutOff = IsAvailableCount / 2.0;
 
             // Disapproval count
             MyDbUtils mdu = new MyDbUtils(this.DbPath);
@@ -223,26 +266,15 @@ namespace StrEmailMonitoring
             };
             Double resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
 
-            // Overall count of responses
-            MyDbUtils mduY = new MyDbUtils(this.DbPath);
-            Dictionary<string, string> countCritY = new Dictionary<string, string>()
+            
+            if (resultCt >= 3) // True if there are 3 or REJECTED
             {
-                ["FileName"] = fileName,
-                ["Phase"] = phaseX,
-            };
-            Double overallCt = mduY.CountEntries(TABLE_NAME, countCritY);
-
-
-            if (overallCt < cutOff) // not enuf respondents
-            {
-                return false; // dont label as disapproved
+                return true;
             }
-
-            if (resultCt == 0) // non existing filename
+            else
             {
-                return false;
+                return false; 
             }
-            return resultCt >= cutOff;
         }
     }
 }
