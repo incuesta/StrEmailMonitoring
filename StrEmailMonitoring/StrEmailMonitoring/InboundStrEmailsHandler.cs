@@ -18,11 +18,13 @@ namespace StrEmailMonitoring
         private string  Response { get; set; }
         private string  ResponseDate { get; set; }
         private string  Phase { get; set; }
+        private string  Inv { get; set; }
+        private string  Msg { get; set; }
         private List<DataRow>  StrRecipientsDrList { get; set; }
         private const string TABLE_NAME = "InboundStrEmails";
 
 
-        public InboundStrEmailsHandler(string dbPath, string fileName = "", string subject = "", string emailUsername = "", string response = "NONE", string responseDate = "")
+        public InboundStrEmailsHandler(string dbPath, string fileName = "", string subject = "", string emailUsername = "", string response = "NONE", string responseDate = "", string inv = "", string msg = "")
         {
             this.DbPath = dbPath;
             this.FileName = fileName;
@@ -31,6 +33,8 @@ namespace StrEmailMonitoring
             this.Response = response;
             this.ResponseDate = responseDate;
             this.Phase = GetPhase(emailUsername);
+            this.Inv = inv;
+            this.Msg = msg;
         }
 
         public InboundStrEmailsHandler(string dbPath, DataTable strRecipientsDT)
@@ -79,7 +83,9 @@ namespace StrEmailMonitoring
                     ["EmailUsername"] = this.EmailUsername,
                     ["Response"] = this.Response,
                     ["ResponseDate"] = this.ResponseDate,
-                    ["Phase"] = this.Phase
+                    ["Phase"] = this.Phase,
+                    ["Inv"] = this.Inv,
+                    ["Message"] = this.Msg
                 };
 
                 MyDbUtils mdu = new MyDbUtils(this.DbPath);
@@ -159,6 +165,20 @@ namespace StrEmailMonitoring
             return resultDT;
         }
 
+        public DataTable LoadFromDbViaFileNameFromOutbound(string fileName, int perBatch = 50, int currentBatch = 1)
+        {
+            Dictionary<string, string> criteriaX = new Dictionary<string, string>()
+            {
+                ["FileName"] = fileName
+            };
+
+            MyDbUtils mdu = new MyDbUtils(this.DbPath);
+            DataTable resultDT = mdu.LoadEntries(tableName: "OutboundStrEmails", orderBy: "Phase", perBatch: perBatch, currentBatch: currentBatch, criteria: criteriaX);
+
+
+            return resultDT;
+        }
+
         /// <summary>
         /// Get Current Phase of a File
         /// </summary>
@@ -167,7 +187,7 @@ namespace StrEmailMonitoring
         public string GetCurrentPhaseViaFileName(string fileName)
         {
             string phaseString = "";
-            DataTable dtX = LoadFromDbViaFileName(fileName);
+            DataTable dtX = LoadFromDbViaFileNameFromOutbound(fileName);
             if (dtX.Rows.Count > 0)
             {
                  phaseString = (dtX.AsEnumerable().OrderBy(drX => drX["Phase"])?.LastOrDefault())["Phase"]?.ToString() ?? string.Empty;
@@ -182,7 +202,7 @@ namespace StrEmailMonitoring
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public bool IsApproved(string fileName)
+        public bool IsApproved(string fileName, int cutOff = 3, string inv = "")
         {
             string phaseX = GetCurrentPhaseViaFileName(fileName);
             MyDbUtils mdu = new MyDbUtils(this.DbPath);
@@ -192,10 +212,16 @@ namespace StrEmailMonitoring
                 ["Phase"] = phaseX,
                 ["Response"] = "APPROVED"
             };
-            long resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
-            Console.WriteLine($"Approval Count >>> {resultCt}");
 
-            return resultCt >= 3;
+            if (!string.IsNullOrEmpty(inv))
+            {
+                countCritX["Inv"] = inv.Trim();
+            }
+
+            long resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
+            Console.WriteLine($"Approval Count >>> {resultCt} | {phaseX}");
+
+            return resultCt >= cutOff;
         }
 
 
@@ -252,8 +278,9 @@ namespace StrEmailMonitoring
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public bool IsDisapproved(string fileName)
+        public bool IsDisapproved(string fileName, int cutOff = 3)
         {
+            
             string phaseX = GetCurrentPhaseViaFileName(fileName);
 
             // Disapproval count
@@ -267,7 +294,7 @@ namespace StrEmailMonitoring
             Double resultCt = mdu.CountEntries(TABLE_NAME, countCritX);
 
             
-            if (resultCt >= 3) // True if there are 3 or REJECTED
+            if (resultCt >= cutOff) // True if there are 3 or REJECTED
             {
                 return true;
             }

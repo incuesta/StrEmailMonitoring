@@ -35,6 +35,12 @@ namespace StrEmailMonitoring
             set;
         }
 
+        [RequiredArgument, Category("Input"), Description("Cutoff")]
+        public InArgument<int> In_CutOff
+        {
+            get;
+            set;
+        }
 
         [Category("Output"), Description("True for Disapproved")]
         public OutArgument<bool> Out_IsDisapproved
@@ -53,9 +59,10 @@ namespace StrEmailMonitoring
             {
                 string fileName = this.In_FileName.Get(context);
                 string dbPath = this.In_DbPath.Get(context);
+                int cutOff = this.In_CutOff.Get(context);
 
                 InboundStrEmailsHandler iseh = new InboundStrEmailsHandler(dbPath);
-                bool isApproved = iseh.IsDisapproved(fileName);
+                bool isApproved = iseh.IsDisapproved(fileName, cutOff);
                 this.Out_IsDisapproved.Set(context, isApproved);
                 
             }

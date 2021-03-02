@@ -64,6 +64,19 @@ namespace StrEmailMonitoring
             set;
         }
 
+        [Category("Input"), Description("Investigator initials")]
+        public InArgument<string> In_Inv
+        {
+            get;
+            set;
+        }
+
+        [RequiredArgument, Category("Input"), Description("Email Body")]
+        public InArgument<string> In_Message
+        {
+            get;
+            set;
+        }
 
 
         #endregion
@@ -80,8 +93,10 @@ namespace StrEmailMonitoring
                 string emailUsername = this.In_EmailUsername.Get(context);
                 string response = this.In_Response.Get(context);
                 string responseDate = this.In_ResponseDate.Get(context);
+                string inv = this.In_Inv.Get(context);
+                string msg = this.In_Message.Get(context);
 
-                InboundStrEmailsHandler iSEHandler = new InboundStrEmailsHandler(dbPath, fileName, subject, emailUsername, response, responseDate);
+                InboundStrEmailsHandler iSEHandler = new InboundStrEmailsHandler(dbPath, fileName, subject, emailUsername, response, responseDate, inv, msg);
                 iSEHandler.InsertToDb();
             }
             catch (Exception e)

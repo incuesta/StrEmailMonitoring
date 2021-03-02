@@ -1,7 +1,7 @@
 D:\sandbox\StrEmailMonitoring\Sandbox\bin\Debug\Sandbox.exe.config
 D:\sandbox\StrEmailMonitoring\Sandbox\bin\Debug\Sandbox.exe
 D:\sandbox\StrEmailMonitoring\Sandbox\bin\Debug\Sandbox.pdb
-D:\sandbox\StrEmailMonitoring\Sandbox\obj\Debug\Sandbox.csprojAssemblyReference.cache
 D:\sandbox\StrEmailMonitoring\Sandbox\obj\Debug\Sandbox.csproj.CoreCompileInputs.cache
 D:\sandbox\StrEmailMonitoring\Sandbox\obj\Debug\Sandbox.exe
 D:\sandbox\StrEmailMonitoring\Sandbox\obj\Debug\Sandbox.pdb
+D:\sandbox\StrEmailMonitoring\Sandbox\obj\Debug\Sandbox.csprojAssemblyReference.cache
